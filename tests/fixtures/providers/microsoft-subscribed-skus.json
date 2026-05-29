@@ -1,0 +1,43 @@
+{
+  "value": [
+    {
+      "skuId": "639dec6b-bb19-468b-871c-c5c441c4b0cb",
+      "skuPartNumber": "Microsoft_365_Copilot",
+      "consumedUnits": 25,
+      "prepaidUnits": { "enabled": 30, "suspended": 0, "warning": 0 },
+      "servicePlans": [
+        { "servicePlanId": "fe221b46-5d8a-4fb4-b49a-5bac527af0d2", "servicePlanName": "GRAPH_CONNECTORS_SEARCH_INDEX", "provisioningStatus": "Success" },
+        { "servicePlanId": "bf28f719-7844-4079-9c78-c1307898e192", "servicePlanName": "COPILOT_STUDIO_IN_COPILOT_FOR_M365", "provisioningStatus": "Success" }
+      ]
+    },
+    {
+      "skuId": "6fd2c87f-b296-42f0-b197-1e91e994b900",
+      "skuPartNumber": "ENTERPRISEPACK",
+      "consumedUnits": 150,
+      "prepaidUnits": { "enabled": 200, "suspended": 0, "warning": 0 },
+      "servicePlans": [
+        { "servicePlanId": "efb87545-963c-4e0d-99df-69c6916d9eb0", "servicePlanName": "EXCHANGE_S_ENTERPRISE", "provisioningStatus": "Success" },
+        { "servicePlanId": "57ff2da0-773e-42df-b2af-ffb7a2317929", "servicePlanName": "TEAMS1", "provisioningStatus": "Success" },
+        { "servicePlanId": "b1188c4c-1b36-4018-b48b-ee07604f6feb", "servicePlanName": "FORMS_PLAN_E3", "provisioningStatus": "Success" }
+      ]
+    },
+    {
+      "skuId": "c2273bd0-dff7-4215-9ef5-2c7bcfb06425",
+      "skuPartNumber": "PROJECTPREMIUM",
+      "consumedUnits": 15,
+      "prepaidUnits": { "enabled": 20, "suspended": 0, "warning": 0 },
+      "servicePlans": [
+        { "servicePlanId": "818523f5-016b-4355-9be8-ed6944946ea7", "servicePlanName": "PROJECT_PROFESSIONAL", "provisioningStatus": "Success" }
+      ]
+    },
+    {
+      "skuId": "1aa94593-ca12-4254-a738-81a5972958e7",
+      "skuPartNumber": "FLOW_FREE",
+      "consumedUnits": 45,
+      "prepaidUnits": { "enabled": 50, "suspended": 0, "warning": 0 },
+      "servicePlans": [
+        { "servicePlanId": "5a10155d-f5c1-411a-a8ec-e99aec467d0f", "servicePlanName": "FLOW_P2_VIRAL", "provisioningStatus": "Success" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  { "user_id": 1001, "user_login": "alice-dev", "last_activity_at": "2026-05-20T14:23:00Z", "total_completions_count": 342, "total_completions_accepted_count": 198, "total_active_days": 18 },
+  { "user_id": 1002, "user_login": "bob-eng", "last_activity_at": "2026-05-22T09:10:00Z", "total_completions_count": 287, "total_completions_accepted_count": 151, "total_active_days": 15 },
+  { "user_id": 1003, "user_login": "carol-dev", "last_activity_at": "2026-05-23T11:45:00Z", "total_completions_count": 415, "total_completions_accepted_count": 231, "total_active_days": 22 },
+  { "user_id": 1004, "user_login": "dave-eng", "last_activity_at": "2026-05-21T16:00:00Z", "total_completions_count": 198, "total_completions_accepted_count": 89, "total_active_days": 12 },
+  { "user_id": 1005, "user_login": "eve-dev", "last_activity_at": "2026-05-19T08:30:00Z", "total_completions_count": 523, "total_completions_accepted_count": 310, "total_active_days": 25 },
+  { "user_id": 1006, "user_login": "frank-ops", "last_activity_at": "2026-05-18T13:20:00Z", "total_completions_count": 143, "total_completions_accepted_count": 62, "total_active_days": 9 },
+  { "user_id": 1007, "user_login": "grace-dev", "last_activity_at": "2026-05-17T10:55:00Z", "total_completions_count": 389, "total_completions_accepted_count": 212, "total_active_days": 20 },
+  { "user_id": 1008, "user_login": "henry-dev", "last_activity_at": "2026-05-16T15:40:00Z", "total_completions_count": 256, "total_completions_accepted_count": 134, "total_active_days": 14 },
+  { "user_id": 1009, "user_login": "iris-dev", "last_activity_at": "2026-05-15T12:00:00Z", "total_completions_count": 178, "total_completions_accepted_count": 91, "total_active_days": 11 },
+  { "user_id": 1010, "user_login": "jack-dev", "last_activity_at": "2026-05-14T09:30:00Z", "total_completions_count": 445, "total_completions_accepted_count": 267, "total_active_days": 23 },
+  { "user_id": 1011, "user_login": "kate-dev", "last_activity_at": "2026-05-13T11:15:00Z", "total_completions_count": 312, "total_completions_accepted_count": 181, "total_active_days": 16 },
+  { "user_id": 1012, "user_login": "liam-dev", "last_activity_at": "2026-05-12T14:50:00Z", "total_completions_count": 267, "total_completions_accepted_count": 148, "total_active_days": 13 },
+  { "user_id": 1013, "user_login": "mia-eng", "last_activity_at": "2026-05-11T10:00:00Z", "total_completions_count": 193, "total_completions_accepted_count": 87, "total_active_days": 10 },
+  { "user_id": 1014, "user_login": "noah-dev", "last_activity_at": "2026-05-10T16:30:00Z", "total_completions_count": 378, "total_completions_accepted_count": 220, "total_active_days": 19 },
+  { "user_id": 1015, "user_login": "olivia-dev", "last_activity_at": "2026-05-09T08:45:00Z", "total_completions_count": 221, "total_completions_accepted_count": 118, "total_active_days": 12 },
+  { "user_id": 1016, "user_login": "peter-dev", "last_activity_at": "2026-05-08T13:10:00Z", "total_completions_count": 156, "total_completions_accepted_count": 72, "total_active_days": 8 },
+  { "user_id": 1017, "user_login": "quinn-dev", "last_activity_at": "2026-03-15T10:00:00Z", "total_completions_count": 89, "total_completions_accepted_count": 34, "total_active_days": 5 },
+  { "user_id": 1018, "user_login": "rachel-dev", "last_activity_at": "2026-02-20T14:00:00Z", "total_completions_count": 45, "total_completions_accepted_count": 18, "total_active_days": 3 },
+  { "user_id": 1019, "user_login": "sam-eng", "last_activity_at": "2026-01-10T09:00:00Z", "total_completions_count": 23, "total_completions_accepted_count": 9, "total_active_days": 2 },
+  { "user_id": 1020, "user_login": "tara-dev", "last_activity_at": "2025-12-05T11:00:00Z", "total_completions_count": 12, "total_completions_accepted_count": 4, "total_active_days": 1 }
+]

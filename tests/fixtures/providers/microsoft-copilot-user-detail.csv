@@ -1,0 +1,26 @@
+Report Refresh Date,User Principal Name,Display Name,Last Activity Date (Teams),Last Activity Date (Word),Last Activity Date (Excel),Last Activity Date (PowerPoint),Last Activity Date (Outlook),Last Activity Date (OneNote),Last Activity Date (Loop),Last Activity Date (Copilot Chat),Has Other Products License,Has Copilot License
+2026-05-24,alice@example.com,Alice Chen,2026-05-23,2026-05-22,2026-05-20,,2026-05-23,2026-05-18,,2026-05-24,True,True
+2026-05-24,bob@example.com,Bob Smith,2026-05-22,2026-05-21,,,2026-05-22,,,2026-05-22,True,True
+2026-05-24,carol@example.com,Carol Johnson,2026-05-24,2026-05-23,2026-05-21,2026-05-20,2026-05-24,2026-05-19,2026-05-22,2026-05-24,True,True
+2026-05-24,dave@example.com,Dave Williams,2026-05-20,,,,,,,2026-05-20,True,True
+2026-05-24,eve@example.com,Eve Martinez,2026-05-24,2026-05-24,2026-05-23,2026-05-22,2026-05-24,2026-05-21,2026-05-23,2026-05-24,True,True
+2026-05-24,frank@example.com,Frank Brown,2026-05-18,,,,2026-05-17,,,2026-05-18,True,True
+2026-05-24,grace@example.com,Grace Davis,2026-05-23,2026-05-22,,2026-05-21,2026-05-23,,2026-05-21,2026-05-23,True,True
+2026-05-24,henry@example.com,Henry Wilson,2026-05-21,2026-05-20,,,2026-05-21,,,2026-05-21,True,True
+2026-05-24,iris@example.com,Iris Taylor,2026-05-22,2026-05-21,2026-05-19,,2026-05-22,,,2026-05-22,True,True
+2026-05-24,jack@example.com,Jack Anderson,2026-05-24,2026-05-23,2026-05-22,2026-05-21,2026-05-24,2026-05-20,2026-05-22,2026-05-24,True,True
+2026-05-24,kate@example.com,Kate Thomas,2026-05-19,2026-05-18,,,2026-05-19,,,2026-05-19,True,True
+2026-05-24,liam@example.com,Liam Jackson,2026-05-20,2026-05-19,,2026-05-18,2026-05-20,,,2026-05-20,True,True
+2026-05-24,mia@example.com,Mia White,2026-05-17,,,,2026-05-16,,,2026-05-17,True,True
+2026-05-24,noah@example.com,Noah Harris,2026-05-23,2026-05-22,2026-05-20,2026-05-19,2026-05-23,2026-05-18,2026-05-21,2026-05-23,True,True
+2026-05-24,olivia@example.com,Olivia Martin,2026-05-18,2026-05-17,,,2026-05-18,,,2026-05-18,True,True
+2026-05-24,peter@example.com,Peter Lee,2026-05-16,,,,2026-05-15,,,2026-05-16,True,True
+2026-05-24,quinn@example.com,Quinn Park,2026-05-15,2026-05-14,,,2026-05-15,,,2026-05-15,True,True
+2026-05-24,rachel@example.com,Rachel Kim,,,,,,,,,True,True
+2026-05-24,sam@example.com,Sam Patel,,,,,,,,,True,True
+2026-05-24,tara@example.com,Tara Robinson,,,,,,,,,True,True
+2026-05-24,uma@example.com,Uma Scott,,,,,,,,,True,False
+2026-05-24,victor@example.com,Victor Torres,,,,,,,,,True,False
+2026-05-24,wendy@example.com,Wendy Nguyen,,,,,,,,,True,False
+2026-05-24,xavier@example.com,Xavier Hill,,,,,,,,,False,False
+2026-05-24,yara@example.com,Yara Adams,,,,,,,,,False,False

@@ -1,0 +1,19 @@
+{
+  "members": [
+    { "id": "cm_001", "email": "alice@example.com", "name": "Alice Chen", "role": "admin" },
+    { "id": "cm_002", "email": "bob@example.com", "name": "Bob Smith", "role": "member" },
+    { "id": "cm_003", "email": "carol@example.com", "name": "Carol Johnson", "role": "member" },
+    { "id": "cm_004", "email": "dave@example.com", "name": "Dave Williams", "role": "member" },
+    { "id": "cm_005", "email": "eve@example.com", "name": "Eve Martinez", "role": "member" },
+    { "id": "cm_006", "email": "frank@example.com", "name": "Frank Brown", "role": "member" },
+    { "id": "cm_007", "email": "grace@example.com", "name": "Grace Davis", "role": "member" },
+    { "id": "cm_008", "email": "henry@example.com", "name": "Henry Wilson", "role": "member" },
+    { "id": "cm_009", "email": "iris@example.com", "name": "Iris Taylor", "role": "member" },
+    { "id": "cm_010", "email": "jack@example.com", "name": "Jack Anderson", "role": "member" },
+    { "id": "cm_011", "email": "kate@example.com", "name": "Kate Thomas", "role": "member" },
+    { "id": "cm_012", "email": "liam@example.com", "name": "Liam Jackson", "role": "member" },
+    { "id": "cm_013", "email": "mia@example.com", "name": "Mia White", "role": "member" },
+    { "id": "cm_014", "email": "noah@example.com", "name": "Noah Harris", "role": "member" },
+    { "id": "cm_015", "email": "olivia@example.com", "name": "Olivia Martin", "role": "member" }
+  ]
+}

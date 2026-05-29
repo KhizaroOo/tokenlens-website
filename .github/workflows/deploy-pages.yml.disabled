@@ -1,0 +1,128 @@
+name: Deploy to GitHub Pages
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Static-export deployment for TokenLens.
+#
+# What gets deployed:
+#   ✅ Full marketing site (14 pages) — fully functional
+#   ✅ Portal UI shells (dashboard, settings, etc.) — visuals only
+#   ⚠️  Backend features (login, sync, live data) DO NOT work on GH Pages
+#        because GH Pages is static hosting. Run on Vercel/Render for backend.
+#
+# How it works:
+#   1. Disable `app/api/` (incompatible with `output: export`)
+#   2. Run `next build` with NEXT_OUTPUT_MODE=export
+#   3. Upload `out/` to GitHub Pages
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment, but don't cancel an in-progress run
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # ─── BUILD ──────────────────────────────────────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Generate Prisma client
+        # Needed because some files type-import @prisma/client
+        run: npx prisma generate
+
+      - name: Disable API routes + dynamic detail pages (need generateStaticParams)
+        run: |
+          mkdir -p .disabled_for_build
+          # API routes — incompatible with `output: export`
+          if [ -d "app/api" ]; then
+            mv app/api .disabled_for_build/api
+            echo "  · Disabled app/api"
+          fi
+          # Dynamic detail pages — would need generateStaticParams() + real data to prerender
+          for path in "app/(dashboard)/ai-models/[modelName]" "app/(dashboard)/ai-teams/[teamId]" "app/(dashboard)/ai-users/[userId]"; do
+            if [ -d "$path" ]; then
+              # Encode the (dashboard) parens for the disabled folder name
+              safe=$(echo "$path" | sed 's|/|__|g' | tr -d '()')
+              mv "$path" ".disabled_for_build/$safe"
+              echo "  · Disabled $path"
+            fi
+          done
+
+      - name: Build (static export)
+        env:
+          NEXT_OUTPUT_MODE:        export
+          # `${{ steps.pages.outputs.base_path }}` is the auto-detected basePath
+          # (e.g. "/tokenlens-idea" for a project page, "" for a user/org page or custom domain)
+          NEXT_PUBLIC_BASE_PATH:   ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_SITE_URL:    ${{ steps.pages.outputs.origin }}${{ steps.pages.outputs.base_path }}
+          # Placeholder env vars — these libs read env at runtime, not build time,
+          # but Node still needs the imports to resolve cleanly
+          DATABASE_URL:            "postgresql://placeholder:placeholder@localhost:5432/placeholder"
+          JWT_SECRET:              "build-time-placeholder-not-used-on-static-deploy"
+          ENCRYPTION_KEY:          "ZmFrZS1lbmNyeXB0aW9uLWtleS1mb3ItYnVpbGQtb25seQ=="
+          NEXTAUTH_URL:            ${{ steps.pages.outputs.origin }}${{ steps.pages.outputs.base_path }}
+        run: npx next build
+
+      - name: Restore disabled folders (post-build)
+        if: always()
+        run: |
+          if [ -d ".disabled_for_build/api" ]; then
+            mv .disabled_for_build/api app/api
+            echo "  · Restored app/api"
+          fi
+          for safe in "app__(dashboard)__ai-models__[modelName]" "app__(dashboard)__ai-teams__[teamId]" "app__(dashboard)__ai-users__[userId]"; do
+            decoded=$(echo "$safe" | sed 's|app__|app/|; s|__|/|g')
+            # Re-insert (dashboard) parens
+            decoded=$(echo "$decoded" | sed 's|dashboard|(dashboard)|')
+            if [ -d ".disabled_for_build/$safe" ]; then
+              mkdir -p "$(dirname "$decoded")"
+              mv ".disabled_for_build/$safe" "$decoded"
+              echo "  · Restored $decoded"
+            fi
+          done
+          rm -rf .disabled_for_build || true
+
+      - name: Disable Jekyll on output (preserve _next/ and underscore-prefixed paths)
+        run: touch out/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  # ─── DEPLOY ─────────────────────────────────────────────────────────────────
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url:  ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id:   deployment
+        uses: actions/deploy-pages@v4

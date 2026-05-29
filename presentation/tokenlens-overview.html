@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TokenLens — Simple Overview</title>
+<style>
+  :root{
+    --bg:#060a12; --panel:#0c1320; --panel2:#0f1828;
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+    --emerald:#10b981; --cyan:#06b6d4; --amber:#f59e0b; --red:#ef4444;
+    --txt:#e6edf6; --muted:#9aabbf; --dim:#5b6b80;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:'Plus Jakarta Sans',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--txt);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+  body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(120px);opacity:.16;z-index:0;pointer-events:none}
+  body::before{width:560px;height:560px;background:var(--emerald);top:-180px;left:-160px}
+  body::after{width:520px;height:520px;background:var(--cyan);bottom:-200px;right:-160px}
+
+  .deck{position:relative;z-index:1;height:100vh;width:100vw}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:56px 84px 84px;animation:fade .45s ease}
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--emerald);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+  .kicker::before{content:"";width:28px;height:1px;background:var(--emerald)}
+  h1{font-size:62px;line-height:1.05;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+  h2{font-size:42px;line-height:1.1;font-weight:700;letter-spacing:-.015em;margin-bottom:14px}
+  .accent{background:linear-gradient(90deg,var(--emerald),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .big-sub{font-size:22px;color:var(--muted);max-width:760px;line-height:1.5;margin-bottom:30px}
+
+  /* ----- scattered → unified funnel (slide 3) ----- */
+  .funnel{display:grid;grid-template-columns:1fr 110px 1fr;align-items:center;gap:0;margin-top:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:12px}
+  .chip{display:flex;align-items:center;gap:9px;background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-size:15px;font-weight:500}
+  .chips.messy .chip{transform:rotate(var(--r,0deg))}
+  .swatch{width:14px;height:14px;border-radius:4px;flex:none}
+  .bigarrow{display:flex;align-items:center;justify-content:center;color:var(--emerald)}
+  .bigarrow svg{width:80px;height:80px}
+  .one-box{background:linear-gradient(160deg,rgba(16,185,129,.12),rgba(6,182,212,.08));border:1.5px solid var(--emerald);border-radius:20px;padding:34px;text-align:center;box-shadow:0 0 50px rgba(16,185,129,.18)}
+  .one-box .t{font-size:26px;font-weight:700;margin-bottom:6px}
+  .one-box .d{font-size:16px;color:var(--muted)}
+
+  /* ----- big icon cards ----- */
+  .grid{display:grid;gap:20px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  .vcard{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center}
+  .vcard .icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25)}
+  .vcard .icon svg{width:32px;height:32px;stroke:var(--emerald)}
+  .vcard h3{font-size:21px;font-weight:600;margin-bottom:8px}
+  .vcard p{font-size:15px;line-height:1.5;color:var(--muted)}
+  .vcard .tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+
+  /* status pills */
+  .pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:5px 11px;border-radius:999px;border:1px solid var(--line2);white-space:nowrap}
+  .pill::before{content:"";width:8px;height:8px;border-radius:50%}
+  .live{color:var(--emerald)} .live::before{background:var(--emerald);box-shadow:0 0 8px var(--emerald)}
+  .pend{color:var(--amber)} .pend::before{background:var(--amber)}
+  .soon{color:var(--cyan)} .soon::before{background:var(--cyan)}
+  .plan{color:var(--dim)} .plan::before{background:var(--dim)}
+
+  /* provider rows (slide 5) */
+  .prow{display:flex;align-items:center;gap:18px;background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:16px 22px;margin-bottom:12px}
+  .prow .pname{font-size:18px;font-weight:600;flex:1}
+  .prow .pcat{font-family:var(--mono);font-size:13px;color:var(--dim);width:160px}
+  .prow .sw{width:16px;height:16px;border-radius:5px;flex:none}
+
+  /* doors / auth (slide 6) */
+  .doors{display:flex;align-items:center;justify-content:center;gap:0;margin-top:20px}
+  .door{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:30px 26px;width:300px;text-align:center}
+  .door .lock{width:54px;height:54px;border-radius:14px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+  .door .lock svg{width:28px;height:28px;stroke:var(--cyan)}
+  .door .step{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.1em;margin-bottom:8px}
+  .door h3{font-size:19px;margin-bottom:8px}
+  .door p{font-size:14px;color:var(--muted);line-height:1.45}
+  .door-arrow{color:var(--emerald);font-size:30px;padding:0 14px}
+  .vault{background:linear-gradient(160deg,rgba(16,185,129,.12),rgba(6,182,212,.08));border:1.5px solid var(--emerald);border-radius:18px;padding:30px 26px;width:240px;text-align:center;box-shadow:0 0 40px rgba(16,185,129,.16)}
+  .vault .lock{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4)} .vault .lock svg{stroke:var(--emerald)}
+  .vault h3{font-size:19px;margin-bottom:6px} .vault p{font-size:14px;color:var(--muted)}
+
+  /* tech logo grid (slide 7) */
+  .logogrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px}
+  .lcard{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .lcard .badge{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:20px;color:#060a12;background:linear-gradient(135deg,var(--emerald),var(--cyan))}
+  .lcard .lname{font-size:17px;font-weight:600}
+  .lcard .ldesc{font-size:13px;color:var(--muted);text-align:center;line-height:1.4}
+
+  /* flows (slide 8) */
+  .flowcard{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;padding:28px}
+  .flowcard .ftitle{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:600;margin-bottom:20px}
+  .flowcard .ficon{width:40px;height:40px;border-radius:10px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);display:flex;align-items:center;justify-content:center}
+  .flowcard .ficon svg{width:22px;height:22px;stroke:var(--cyan)}
+  .steps{display:flex;flex-direction:column;gap:14px}
+  .step-row{display:flex;align-items:flex-start;gap:14px}
+  .step-row .n{width:28px;height:28px;border-radius:50%;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);color:var(--emerald);font-family:var(--mono);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none}
+  .step-row .stxt{font-size:16px;line-height:1.4;padding-top:3px}
+
+  /* security shield (slide 9) */
+  .secwrap{display:grid;grid-template-columns:280px 1fr;gap:50px;align-items:center;margin-top:10px}
+  .shield{display:flex;align-items:center;justify-content:center}
+  .shield svg{width:220px;height:220px;stroke:var(--emerald);filter:drop-shadow(0 0 30px rgba(16,185,129,.3))}
+  ul.checks{list-style:none;display:flex;flex-direction:column;gap:18px}
+  ul.checks li{font-size:19px;display:flex;align-items:flex-start;gap:14px;line-height:1.4}
+  ul.checks li .ck{width:26px;height:26px;border-radius:50%;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4);display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+  ul.checks li .ck svg{width:14px;height:14px;stroke:var(--emerald)}
+  ul.checks li span{color:var(--muted);font-size:16px}
+
+  /* timeline (slide 10) */
+  .timeline{display:flex;align-items:stretch;gap:0;margin-top:24px}
+  .tnode{flex:1;text-align:center;position:relative;padding:0 10px}
+  .tnode .dot{width:22px;height:22px;border-radius:50%;margin:0 auto 18px;border:3px solid var(--bg);position:relative;z-index:2}
+  .tnode.done .dot{background:var(--emerald);box-shadow:0 0 14px var(--emerald)}
+  .tnode.now .dot{background:var(--amber);box-shadow:0 0 14px var(--amber)}
+  .tnode.next .dot{background:var(--cyan)}
+  .tnode.future .dot{background:var(--dim)}
+  .tline{position:absolute;top:8px;left:50%;width:100%;height:3px;background:var(--line2);z-index:1}
+  .tnode:last-child .tline{display:none}
+  .tnode h4{font-size:18px;font-weight:700;margin-bottom:6px}
+  .tnode .tphase{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.08em;margin-bottom:10px}
+  .tnode p{font-size:14px;color:var(--muted);line-height:1.45}
+  .stat-row{display:flex;gap:20px;margin-top:42px;justify-content:center}
+  .stat{text-align:center}
+  .stat .num{font-family:var(--mono);font-size:40px;font-weight:700;color:var(--emerald);line-height:1}
+  .stat .lbl{font-size:14px;color:var(--muted);margin-top:8px}
+
+  /* checklist (slide 11) */
+  .worklist{display:grid;grid-template-columns:1fr 1fr;gap:16px 50px;margin-top:10px}
+  .work{display:flex;align-items:center;gap:14px;font-size:18px}
+  .work .ck{width:28px;height:28px;border-radius:8px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4);display:flex;align-items:center;justify-content:center;flex:none}
+  .work .ck svg{width:16px;height:16px;stroke:var(--emerald)}
+
+  /* title slide */
+  .title-wrap{margin:auto 0;display:flex;flex-direction:column}
+  .logo{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+  .logo .mk{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--emerald),var(--cyan));position:relative;box-shadow:0 0 30px rgba(16,185,129,.4)}
+  .logo .mk::after{content:"";position:absolute;inset:13px;border-radius:50%;border:3px solid #060a12}
+  .logo .name{font-size:26px;font-weight:700}
+  .title-wrap h1{font-size:74px;max-width:1000px}
+  .title-sub{font-size:24px;color:var(--muted);max-width:780px;margin-top:8px;line-height:1.5}
+  .title-meta{display:flex;gap:30px;margin-top:46px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+  .title-meta b{color:var(--emerald);font-weight:600}
+
+  .foot{position:fixed;bottom:24px;left:84px;right:84px;display:flex;justify-content:space-between;align-items:center;z-index:2;font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand b{color:var(--txt);font-weight:600}
+  .dot8{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--emerald),var(--cyan));box-shadow:0 0 14px var(--emerald)}
+  .progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--emerald),var(--cyan));z-index:5;transition:width .35s ease}
+  .counter{font-variant-numeric:tabular-nums}
+  .hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--dim);z-index:3;opacity:.65}
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 · TITLE -->
+  <section class="slide active">
+    <div class="title-wrap">
+      <div class="logo"><div class="mk"></div><div class="name">TokenLens</div></div>
+      <h1>All your AI spending,<br><span class="accent">in one simple view.</span></h1>
+      <p class="title-sub">Teams use many AI tools. TokenLens shows the cost and usage of all of them — in one place.</p>
+      <div class="title-meta">
+        <span>A SIMPLE OVERVIEW</span>
+        <span>BUILT WITH · <b>Next.js · PostgreSQL</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · THE PROBLEM -->
+  <section class="slide">
+    <div class="kicker">The problem</div>
+    <h2>Today, AI spending is a <span class="accent">mess</span></h2>
+    <p class="big-sub">Every AI tool sends its own bill. Nobody sees the full picture.</p>
+    <div class="grid g3">
+      <div class="vcard">
+        <div class="icon" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" style="stroke:var(--red)"><path d="M3 3h18v4H3zM6 7v14M18 7v14M6 12h12M6 17h12"/></svg></div>
+        <h3>Too many bills</h3>
+        <p>Claude, OpenAI, Copilot, Cursor — each one bills you separately.</p>
+      </div>
+      <div class="vcard">
+        <div class="icon" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" style="stroke:var(--red)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4M11 8v3M11 14h.01"/></svg></div>
+        <h3>Who spent what?</h3>
+        <p>No way to see cost per team, per person, or per AI model.</p>
+      </div>
+      <div class="vcard">
+        <div class="icon" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" style="stroke:var(--red)"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+        <h3>No control</h3>
+        <p>No alerts, no limits. You find out only when the bill arrives.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · THE SOLUTION (funnel visual) -->
+  <section class="slide">
+    <div class="kicker">The fix</div>
+    <h2>TokenLens puts it <span class="accent">all in one place</span></h2>
+    <div class="funnel">
+      <div class="chips messy">
+        <div class="chip" style="--r:-3deg"><span class="swatch" style="background:#d97757"></span>Claude</div>
+        <div class="chip" style="--r:2deg"><span class="swatch" style="background:#10a37f"></span>OpenAI</div>
+        <div class="chip" style="--r:-2deg"><span class="swatch" style="background:#6e7681"></span>Copilot</div>
+        <div class="chip" style="--r:3deg"><span class="swatch" style="background:#06b6d4"></span>Cursor</div>
+        <div class="chip" style="--r:-1deg"><span class="swatch" style="background:#0078d4"></span>M365 Copilot</div>
+        <div class="chip" style="--r:2deg"><span class="swatch" style="background:#a78bfa"></span>Gemini</div>
+      </div>
+      <div class="bigarrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+      <div class="one-box">
+        <div class="t">One Dashboard</div>
+        <div class="d">All cost &amp; usage, side by side</div>
+      </div>
+    </div>
+    <p class="big-sub" style="margin-top:36px;text-align:center;align-self:center">Connect each tool once. We pull the numbers for you — automatically.</p>
+  </section>
+
+  <!-- 4 · THREE LENSES -->
+  <section class="slide">
+    <div class="kicker">What you see</div>
+    <h2>Three simple views</h2>
+    <div class="grid g3">
+      <div class="vcard">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M2 7h20M2 17h20"/></svg></div>
+        <h3>AI Model Spend</h3>
+        <p>How much you pay Claude and OpenAI for tokens.</p>
+        <div class="tags"><span class="pill live">Claude works now</span></div>
+      </div>
+      <div class="vcard">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 6 2 12l6 6M16 6l6 6-6 6"/></svg></div>
+        <h3>Coding Tools</h3>
+        <p>Cost per developer for Claude Code, Copilot &amp; Cursor.</p>
+        <div class="tags"><span class="pill live">Claude Code now</span></div>
+      </div>
+      <div class="vcard">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+        <h3>Office AI</h3>
+        <p>Microsoft 365 Copilot seats and how much they're used.</p>
+        <div class="tags"><span class="pill pend">Testing</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · PROVIDER COVERAGE -->
+  <section class="slide">
+    <div class="kicker">Which tools work</div>
+    <h2>We're <span class="accent">honest</span> about what's ready</h2>
+    <div style="display:flex;gap:26px;margin:12px 0 20px;font-size:15px">
+      <span class="pill live">Working now</span>
+      <span class="pill pend">Built — being tested</span>
+      <span class="pill plan">Not possible yet</span>
+    </div>
+    <div>
+      <div class="prow"><span class="sw" style="background:#d97757"></span><span class="pname">Claude &amp; Claude Code</span><span class="pcat">AI model + coding</span><span class="pill live">Working now</span></div>
+      <div class="prow"><span class="sw" style="background:#10a37f"></span><span class="pname">OpenAI</span><span class="pcat">AI model</span><span class="pill pend">Being tested</span></div>
+      <div class="prow"><span class="sw" style="background:#6e7681"></span><span class="pname">GitHub Copilot &amp; Cursor</span><span class="pcat">Coding tools</span><span class="pill pend">Being tested</span></div>
+      <div class="prow"><span class="sw" style="background:#0078d4"></span><span class="pname">Microsoft 365 Copilot</span><span class="pcat">Office AI</span><span class="pill pend">Being tested</span></div>
+      <div class="prow"><span class="sw" style="background:#a78bfa"></span><span class="pname">Gemini &amp; Perplexity</span><span class="pcat">AI model</span><span class="pill plan">No data API yet</span></div>
+    </div>
+  </section>
+
+  <!-- 6 · SECURITY DOORS -->
+  <section class="slide">
+    <div class="kicker">How we keep data safe</div>
+    <h2>Three locked doors before <span class="accent">anyone sees data</span></h2>
+    <div class="doors">
+      <div class="door">
+        <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="step">DOOR 1</div>
+        <h3>The gate</h3>
+        <p>Checks your login before any page loads.</p>
+      </div>
+      <div class="door-arrow">→</div>
+      <div class="door">
+        <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="step">DOOR 2</div>
+        <h3>The page</h3>
+        <p>Checks again on the server, just in case.</p>
+      </div>
+      <div class="door-arrow">→</div>
+      <div class="vault">
+        <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="step" style="color:var(--emerald)">DATA</div>
+        <h3>Door 3</h3>
+        <p>Every request only shows your own company's data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · TECH STACK -->
+  <section class="slide">
+    <div class="kicker">What it's built with</div>
+    <h2>Modern, trusted tools</h2>
+    <div class="logogrid">
+      <div class="lcard"><div class="badge">N</div><div class="lname">Next.js 16</div><div class="ldesc">The web app framework</div></div>
+      <div class="lcard"><div class="badge">TS</div><div class="lname">TypeScript</div><div class="ldesc">Safe, typed code</div></div>
+      <div class="lcard"><div class="badge">P</div><div class="lname">PostgreSQL</div><div class="ldesc">The database (on Neon)</div></div>
+      <div class="lcard"><div class="badge">◆</div><div class="lname">Prisma</div><div class="ldesc">Talks to the database</div></div>
+      <div class="lcard"><div class="badge">T</div><div class="lname">Tailwind</div><div class="ldesc">The look &amp; feel</div></div>
+      <div class="lcard"><div class="badge">R</div><div class="lname">Recharts</div><div class="ldesc">The charts</div></div>
+      <div class="lcard"><div class="badge">🔒</div><div class="lname">JWT + AES</div><div class="ldesc">Login &amp; encryption</div></div>
+      <div class="lcard"><div class="badge">@</div><div class="lname">Resend</div><div class="ldesc">Sends email alerts</div></div>
+    </div>
+  </section>
+
+  <!-- 8 · HOW DATA ARRIVES -->
+  <section class="slide">
+    <div class="kicker">How it works</div>
+    <h2>Two simple flows</h2>
+    <div class="grid g2">
+      <div class="flowcard">
+        <div class="ftitle"><span class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9M21 3v6h-6"/></svg></span>Getting your AI numbers</div>
+        <div class="steps">
+          <div class="step-row"><span class="n">1</span><span class="stxt">You add your AI tool's key in Settings</span></div>
+          <div class="step-row"><span class="n">2</span><span class="stxt">We lock it away with strong encryption</span></div>
+          <div class="step-row"><span class="n">3</span><span class="stxt">A worker fetches your usage automatically</span></div>
+          <div class="step-row"><span class="n">4</span><span class="stxt">Numbers show up on your dashboard</span></div>
+        </div>
+      </div>
+      <div class="flowcard">
+        <div class="ftitle"><span class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16v16H4zM4 8l8 5 8-5"/></svg></span>When someone contacts us</div>
+        <div class="steps">
+          <div class="step-row"><span class="n">1</span><span class="stxt">They fill the contact or demo form</span></div>
+          <div class="step-row"><span class="n">2</span><span class="stxt">We block spam and bots automatically</span></div>
+          <div class="step-row"><span class="n">3</span><span class="stxt">The message is saved safely (no raw IP)</span></div>
+          <div class="step-row"><span class="n">4</span><span class="stxt">The sales team gets an email</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · SECURITY / PRIVACY -->
+  <section class="slide">
+    <div class="kicker">Privacy first</div>
+    <h2>We only store the <span class="accent">numbers</span></h2>
+    <div class="secwrap">
+      <div class="shield"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <ul class="checks">
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Never your prompts, answers, or code <span>— only cost &amp; usage</span></li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>API keys locked with strong encryption</li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Each company only sees its own data</li>
+        <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>No fake claims <span>— we say only what is true</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10 · ROADMAP TIMELINE -->
+  <section class="slide">
+    <div class="kicker">The plan</div>
+    <h2>Where we are, what's next</h2>
+    <div class="timeline">
+      <div class="tnode done"><div class="tline"></div><div class="dot"></div><div class="tphase">STEP 1 · DONE</div><h4>Claude live</h4><p>Real Claude data, login, dashboards, teams &amp; users.</p></div>
+      <div class="tnode now"><div class="tline"></div><div class="dot"></div><div class="tphase">STEP 2 · NOW</div><h4>More tools</h4><p>OpenAI, Copilot, Cursor, M365 — built, being tested.</p></div>
+      <div class="tnode next"><div class="tline"></div><div class="dot"></div><div class="tphase">STEP 3 · SOON</div><h4>Alerts</h4><p>Budget alerts, reports &amp; audit logs.</p></div>
+      <div class="tnode future"><div class="dot"></div><div class="tphase">STEP 4 · LATER</div><h4>Smart tips</h4><p>ROI scores &amp; ways to save money.</p></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num">2</div><div class="lbl">tools live today</div></div>
+      <div class="stat"><div class="num">26</div><div class="lbl">dashboard pages built</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">tools supported in total</div></div>
+    </div>
+  </section>
+
+  <!-- 11 · WHAT WORKS TODAY -->
+  <section class="slide">
+    <div class="kicker">Ready now</div>
+    <h2>What you can show <span class="accent">today</span></h2>
+    <div class="worklist">
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>The full website</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>The working dashboard</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Real Claude spending data</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Secure login</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Add a tool &amp; sync it</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Cost per team &amp; person</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Contact &amp; demo forms</div>
+      <div class="work"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg></span>Light &amp; dark mode</div>
+    </div>
+  </section>
+
+  <!-- 12 · CLOSING -->
+  <section class="slide">
+    <div class="title-wrap">
+      <div class="logo"><div class="mk"></div><div class="name">TokenLens</div></div>
+      <h1 style="font-size:64px">See every AI dollar.<br><span class="accent">In one simple place.</span></h1>
+      <p class="title-sub">Claude works today. More tools are on the way. Simple, honest, and secure.</p>
+      <div class="title-meta">
+        <span>TRY IT · <b>admin@tokenlens.ai</b></span>
+        <span>THANK YOU</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="foot">
+  <div class="brand"><span class="dot8"></span><b>TokenLens</b><span>· Simple Overview</span></div>
+  <div class="counter"><span id="cur">01</span> / <span id="tot">12</span></div>
+</div>
+<div class="hint">← → or Space to move · F for fullscreen</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0; const tot=slides.length;
+  document.getElementById('tot').textContent=String(tot).padStart(2,'0');
+  function show(n){
+    i=Math.max(0,Math.min(tot-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    document.getElementById('cur').textContent=String(i+1).padStart(2,'0');
+    document.getElementById('bar').style.width=((i+1)/tot*100)+'%';
+  }
+  function next(){show(i+1)} function prev(){show(i-1)}
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();next()}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();prev()}
+    else if(e.key==='Home'){show(0)} else if(e.key==='End'){show(tot-1)}
+    else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  });
+  let sx=0;
+  document.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)dx<0?next():prev()},{passive:true});
+  document.getElementById('deck').addEventListener('click',e=>{if(e.clientX>window.innerWidth*0.55)next();else if(e.clientX<window.innerWidth*0.2)prev()});
+  show(0);
+</script>
+</body>
+</html>

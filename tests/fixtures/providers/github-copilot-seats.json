@@ -1,0 +1,28 @@
+{
+  "total_seats": 22,
+  "seats": [
+    { "assignee": { "login": "alice-dev", "email": "alice@example.com" }, "last_activity_at": "2026-05-20T14:23:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "bob-eng", "email": "bob@example.com" }, "last_activity_at": "2026-05-22T09:10:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "carol-dev", "email": "carol@example.com" }, "last_activity_at": "2026-05-23T11:45:00Z", "last_activity_editor": "jetbrains", "plan_type": "business" },
+    { "assignee": { "login": "dave-eng", "email": "dave@example.com" }, "last_activity_at": "2026-05-21T16:00:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "eve-dev", "email": "eve@example.com" }, "last_activity_at": "2026-05-19T08:30:00Z", "last_activity_editor": "neovim", "plan_type": "business" },
+    { "assignee": { "login": "frank-ops", "email": "frank@example.com" }, "last_activity_at": "2026-05-18T13:20:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "grace-dev", "email": "grace@example.com" }, "last_activity_at": "2026-05-17T10:55:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "henry-dev", "email": "henry@example.com" }, "last_activity_at": "2026-05-16T15:40:00Z", "last_activity_editor": "jetbrains", "plan_type": "business" },
+    { "assignee": { "login": "iris-dev", "email": "iris@example.com" }, "last_activity_at": "2026-05-15T12:00:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "jack-dev", "email": "jack@example.com" }, "last_activity_at": "2026-05-14T09:30:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "kate-dev", "email": "kate@example.com" }, "last_activity_at": "2026-05-13T11:15:00Z", "last_activity_editor": "neovim", "plan_type": "business" },
+    { "assignee": { "login": "liam-dev", "email": "liam@example.com" }, "last_activity_at": "2026-05-12T14:50:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "mia-eng", "email": "mia@example.com" }, "last_activity_at": "2026-05-11T10:00:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "noah-dev", "email": "noah@example.com" }, "last_activity_at": "2026-05-10T16:30:00Z", "last_activity_editor": "jetbrains", "plan_type": "business" },
+    { "assignee": { "login": "olivia-dev", "email": "olivia@example.com" }, "last_activity_at": "2026-05-09T08:45:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "peter-dev", "email": "peter@example.com" }, "last_activity_at": "2026-05-08T13:10:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "quinn-dev", "email": "quinn@example.com" }, "last_activity_at": "2026-03-15T10:00:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "rachel-dev", "email": "rachel@example.com" }, "last_activity_at": "2026-02-20T14:00:00Z", "last_activity_editor": "jetbrains", "plan_type": "business" },
+    { "assignee": { "login": "sam-eng", "email": "sam@example.com" }, "last_activity_at": "2026-01-10T09:00:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "tara-dev", "email": "tara@example.com" }, "last_activity_at": "2025-12-05T11:00:00Z", "last_activity_editor": "vscode", "plan_type": "business" },
+    { "assignee": { "login": "uma-dev", "email": "uma@example.com" }, "last_activity_at": null, "last_activity_editor": null, "plan_type": "business" },
+    { "assignee": { "login": "victor-dev", "email": "victor@example.com" }, "last_activity_at": null, "last_activity_editor": null, "plan_type": "business" }
+  ],
+  "_comment": "22 seats total. 16 active (last_activity_at within 30 days of 2026-05-24). 4 inactive (>30 days). 2 null activity."
+}

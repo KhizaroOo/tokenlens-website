@@ -1,0 +1,758 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Organization {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  website          String?
+  timezone         String?  @default("UTC")
+  monthlyBudgetUsd Decimal? @db.Decimal(10, 2)
+  dataMode         String?  @default("demo")
+
+  members                      OrganizationMember[]
+  teams                        Team[]
+  providerConnections          ProviderConnection[]
+  usageDaily                   UsageDaily[]
+  modelUsageDaily              ModelUsageDaily[]
+  claudeCodeDaily              ClaudeCodeDaily[]
+  budgets                      Budget[]
+  alertRules                   AlertRule[]
+  alerts                       Alert[]
+  auditLogs                    AuditLog[]
+  // Phase 2
+  providerSyncRuns             ProviderSyncRun[]
+  aiUsageDaily                 AiUsageDaily[]
+  aiModelUsageDaily            AiModelUsageDaily[]
+  developerAiDaily             DeveloperAiDaily[]
+  seatUsageDaily               SeatUsageDaily[]
+  businessAiDaily              BusinessAiDaily[]
+  providerUserMappings         ProviderUserMapping[]
+  // Phase 3
+  aiAdoptionScoreDaily         AiAdoptionScoreDaily[]
+  aiWasteScoreDaily            AiWasteScoreDaily[]
+  teamEfficiencyScoreDaily     TeamEfficiencyScoreDaily[]
+  recommendations              Recommendation[]
+  githubRepositories           GitHubRepository[]
+  githubPullRequestDaily       GitHubPullRequestDaily[]
+  githubCommitDaily            GitHubCommitDaily[]
+  jiraProjects                 JiraProject[]
+  jiraIssueDaily               JiraIssueDaily[]
+  productivityCorrelationDaily ProductivityCorrelationDaily[]
+  notificationChannels         NotificationChannel[]
+  notificationDeliveryLogs     NotificationDeliveryLog[]
+  dataRetentionPolicy          DataRetentionPolicy?
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships          OrganizationMember[]
+  teamMembers          TeamMember[]
+  auditLogs            AuditLog[]
+  // Phase 2
+  providerUserMappings ProviderUserMapping[]
+}
+
+model OrganizationMember {
+  id             String     @id @default(cuid())
+  organizationId String
+  userId         String
+  role           MemberRole @default(viewer)
+  joinedAt       DateTime   @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+enum MemberRole {
+  owner
+  admin
+  viewer
+}
+
+model Team {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members         TeamMember[]
+  usageDaily      UsageDaily[]
+  claudeCodeDaily ClaudeCodeDaily[]
+  budgets         Budget[]
+
+  @@unique([organizationId, slug])
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model ProviderConnection {
+  id                     String           @id @default(cuid())
+  organizationId         String
+  provider               String           @default("anthropic")
+  encryptedApiKey        String?
+  status                 ConnectionStatus @default(not_connected)
+  lastSyncAt             DateTime?
+  lastSyncError          String?
+  lastUsageSyncedAt      DateTime?
+  lastClaudeCodeSyncedAt DateTime?
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider])
+}
+
+enum ConnectionStatus {
+  not_connected
+  connected
+  failed
+  disabled
+}
+
+model UsageDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String   @default("anthropic")
+  date           DateTime @db.Date
+  userEmail      String
+  teamId         String?
+  inputTokens    Int      @default(0)
+  outputTokens   Int      @default(0)
+  cachedTokens   Int      @default(0)
+  totalTokens    Int      @default(0)
+  totalCostUsd   Decimal  @default(0) @db.Decimal(10, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id])
+
+  @@unique([organizationId, provider, date, userEmail])
+  @@index([organizationId, date])
+  @@index([organizationId, userEmail])
+}
+
+model ModelUsageDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String   @default("anthropic")
+  model          String
+  date           DateTime @db.Date
+  inputTokens    Int      @default(0)
+  outputTokens   Int      @default(0)
+  cachedTokens   Int      @default(0)
+  totalTokens    Int      @default(0)
+  totalCostUsd   Decimal  @default(0) @db.Decimal(10, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider, model, date])
+  @@index([organizationId, date])
+}
+
+model ClaudeCodeDaily {
+  id               String   @id @default(cuid())
+  organizationId   String
+  userEmail        String
+  teamId           String?
+  date             DateTime @db.Date
+  sessions         Int      @default(0)
+  commits          Int      @default(0)
+  pullRequests     Int      @default(0)
+  linesAdded       Int      @default(0)
+  linesRemoved     Int      @default(0)
+  estimatedCostUsd Decimal  @default(0) @db.Decimal(10, 6)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id])
+
+  @@unique([organizationId, userEmail, date])
+  @@index([organizationId, date])
+}
+
+model Budget {
+  id             String       @id @default(cuid())
+  organizationId String
+  teamId         String?
+  name           String
+  limitUsd       Decimal      @db.Decimal(10, 2)
+  period         BudgetPeriod @default(monthly)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id])
+}
+
+enum BudgetPeriod {
+  daily
+  weekly
+  monthly
+}
+
+model AlertRule {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  metric         String
+  threshold      Decimal  @db.Decimal(10, 4)
+  operator       String   @default("gt")
+  period         String   @default("daily")
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  alerts       Alert[]
+}
+
+model Alert {
+  id             String        @id @default(cuid())
+  organizationId String
+  alertRuleId    String
+  message        String
+  severity       AlertSeverity @default(warning)
+  resolvedAt     DateTime?
+  createdAt      DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  alertRule    AlertRule    @relation(fields: [alertRuleId], references: [id], onDelete: Cascade)
+}
+
+enum AlertSeverity {
+  info
+  warning
+  critical
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  action         String
+  resource       String?
+  resourceId     String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, createdAt])
+}
+
+// ─── Phase 2: Multi-Provider Intelligence Layer ────────────────────────────────
+
+/// Tracks every sync attempt for any provider
+model ProviderSyncRun {
+  id             String    @id @default(cuid())
+  organizationId String
+  provider       String // e.g. "openai", "github_copilot"
+  status         String // "running" | "success" | "failed"
+  recordsSynced  Int       @default(0)
+  errorMessage   String?
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, provider])
+  @@index([organizationId, startedAt])
+}
+
+/// Generic daily token + cost rows for API Spend providers (Claude, OpenAI, Gemini, Perplexity)
+model AiUsageDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String // "anthropic" | "openai" | "gemini" | "perplexity"
+  date           DateTime
+  userEmail      String
+  teamId         String?
+  inputTokens    Int      @default(0)
+  outputTokens   Int      @default(0)
+  cachedTokens   Int      @default(0)
+  totalTokens    Int      @default(0)
+  totalCostUsd   Decimal  @default(0) @db.Decimal(12, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider, date, userEmail])
+  @@index([organizationId, provider, date])
+}
+
+/// Cross-provider model-level analytics (which model, which provider, daily totals)
+model AiModelUsageDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String
+  model          String
+  date           DateTime
+  inputTokens    Int      @default(0)
+  outputTokens   Int      @default(0)
+  totalTokens    Int      @default(0)
+  totalCostUsd   Decimal  @default(0) @db.Decimal(12, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider, model, date])
+  @@index([organizationId, provider, date])
+}
+
+/// Developer AI activity (Claude Code, GitHub Copilot, Cursor) — event-based, not token-based
+model DeveloperAiDaily {
+  id              String   @id @default(cuid())
+  organizationId  String
+  provider        String // "claude_code" | "github_copilot" | "cursor"
+  date            DateTime
+  userEmail       String
+  teamId          String?
+  // Claude Code metrics
+  sessions        Int      @default(0)
+  linesAdded      Int      @default(0)
+  linesRemoved    Int      @default(0)
+  filesChanged    Int      @default(0)
+  commitsAssisted Int      @default(0)
+  prsAssisted     Int      @default(0)
+  // Copilot / Cursor metrics
+  suggestions     Int      @default(0)
+  acceptances     Int      @default(0)
+  completions     Int      @default(0)
+  // Cost (where applicable)
+  totalCostUsd    Decimal  @default(0) @db.Decimal(12, 6)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider, date, userEmail])
+  @@index([organizationId, provider, date])
+}
+
+/// Seat / license tracking (GitHub Copilot, Cursor, Microsoft Copilot)
+model SeatUsageDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String
+  date           DateTime
+  totalSeats     Int      @default(0)
+  activeSeats    Int      @default(0)
+  costPerSeat    Decimal  @default(0) @db.Decimal(8, 4)
+  totalCostUsd   Decimal  @default(0) @db.Decimal(12, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider, date])
+  @@index([organizationId, provider, date])
+}
+
+/// Microsoft Copilot app-level usage (Teams, Word, Excel, Outlook, etc.)
+model BusinessAiDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String   @default("microsoft_copilot")
+  app            String // "teams" | "word" | "excel" | "outlook" | "powerpoint"
+  date           DateTime
+  activeUsers    Int      @default(0)
+  totalSessions  Int      @default(0)
+  totalCostUsd   Decimal  @default(0) @db.Decimal(12, 6)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider, app, date])
+  @@index([organizationId, provider, date])
+}
+
+/// Maps provider-specific user identities to TokenLens User records
+model ProviderUserMapping {
+  id             String   @id @default(cuid())
+  organizationId String
+  provider       String
+  providerUserId String // The identifier used by the external provider
+  userEmail      String
+  userId         String? // TokenLens user id — null if not yet matched
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, provider, providerUserId])
+  @@index([organizationId, provider])
+}
+
+// ─── Phase 3: AI ROI Intelligence Layer ───────────────────────────────────────
+
+/// Daily AI adoption score per user/team/org
+model AiAdoptionScoreDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  date           DateTime @db.Date
+  entityType     String // "user" | "team" | "org"
+  entityId       String // userEmail, teamId, or organizationId
+  score          Decimal  @default(0) @db.Decimal(5, 2)
+  activeDays     Int      @default(0)
+  providersUsed  Int      @default(0)
+  totalSessions  Int      @default(0)
+  totalTokens    Int      @default(0)
+  badge          String   @default("inactive") // "high" | "healthy" | "low" | "inactive"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date, entityType, entityId])
+  @@index([organizationId, entityType, date])
+}
+
+/// Daily AI waste score per user/team/provider/model
+model AiWasteScoreDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  date           DateTime @db.Date
+  entityType     String // "user" | "team" | "provider" | "model"
+  entityId       String
+  score          Decimal  @default(0) @db.Decimal(5, 2)
+  inactiveSeats  Int      @default(0)
+  wastedCostUsd  Decimal  @default(0) @db.Decimal(12, 6)
+  reasons        Json? // array of waste reason strings
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date, entityType, entityId])
+  @@index([organizationId, entityType, date])
+}
+
+/// Daily team efficiency score
+model TeamEfficiencyScoreDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  teamId         String
+  date           DateTime @db.Date
+  score          Decimal  @default(0) @db.Decimal(5, 2)
+  status         String   @default("healthy") // "efficient" | "healthy" | "needs_review" | "high_waste"
+  totalSpendUsd  Decimal  @default(0) @db.Decimal(12, 6)
+  activeUsers    Int      @default(0)
+  devAiSessions  Int      @default(0)
+  costPerUser    Decimal  @default(0) @db.Decimal(12, 6)
+  prCount        Int      @default(0)
+  commitCount    Int      @default(0)
+  ticketCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, teamId, date])
+  @@index([organizationId, teamId, date])
+}
+
+/// AI recommendations generated by the rules engine
+model Recommendation {
+  id                  String    @id @default(cuid())
+  organizationId      String
+  type                String // "reduce_premium_model" | "review_inactive_seats" | "train_low_adoption" | etc.
+  priority            String    @default("medium") // "low" | "medium" | "high" | "critical"
+  status              String    @default("open") // "open" | "accepted" | "dismissed" | "resolved"
+  title               String
+  description         String
+  entityType          String? // "user" | "team" | "provider" | "model"
+  entityId            String?
+  estimatedSavingsUsd Decimal?  @db.Decimal(12, 6)
+  metadata            Json?
+  resolvedAt          DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@index([organizationId, priority])
+}
+
+/// GitHub repository metadata (no source code stored)
+model GitHubRepository {
+  id             String   @id @default(cuid())
+  organizationId String
+  githubRepoId   String
+  name           String
+  fullName       String
+  language       String?
+  isPrivate      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization          Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pullRequestDailyStats GitHubPullRequestDaily[]
+  commitDailyStats      GitHubCommitDaily[]
+
+  @@unique([organizationId, githubRepoId])
+  @@index([organizationId])
+}
+
+/// Daily GitHub pull request metadata per repo
+model GitHubPullRequestDaily {
+  id              String   @id @default(cuid())
+  organizationId  String
+  repositoryId    String
+  date            DateTime @db.Date
+  opened          Int      @default(0)
+  merged          Int      @default(0)
+  closed          Int      @default(0)
+  reviewed        Int      @default(0)
+  avgCycleTimeHrs Decimal? @db.Decimal(8, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  repository   GitHubRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, repositoryId, date])
+  @@index([organizationId, date])
+}
+
+/// Daily GitHub commit metadata per repo
+model GitHubCommitDaily {
+  id             String   @id @default(cuid())
+  organizationId String
+  repositoryId   String
+  date           DateTime @db.Date
+  commits        Int      @default(0)
+  authors        Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  repository   GitHubRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, repositoryId, date])
+  @@index([organizationId, date])
+}
+
+/// Jira project metadata
+model JiraProject {
+  id             String   @id @default(cuid())
+  organizationId String
+  jiraProjectId  String
+  key            String
+  name           String
+  projectType    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  issueDailyStats JiraIssueDaily[]
+
+  @@unique([organizationId, jiraProjectId])
+  @@index([organizationId])
+}
+
+/// Daily Jira issue metadata per project (metadata only, no descriptions)
+model JiraIssueDaily {
+  id               String   @id @default(cuid())
+  organizationId   String
+  projectId        String
+  date             DateTime @db.Date
+  opened           Int      @default(0)
+  resolved         Int      @default(0)
+  inProgress       Int      @default(0)
+  bugs             Int      @default(0)
+  storyPoints      Decimal? @db.Decimal(8, 2)
+  avgResolutionHrs Decimal? @db.Decimal(8, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      JiraProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, projectId, date])
+  @@index([organizationId, date])
+}
+
+/// Daily productivity correlation (AI spend vs engineering activity)
+model ProductivityCorrelationDaily {
+  id              String   @id @default(cuid())
+  organizationId  String
+  teamId          String?
+  date            DateTime @db.Date
+  aiSpendUsd      Decimal  @default(0) @db.Decimal(12, 6)
+  prsMerged       Int      @default(0)
+  commitsCount    Int      @default(0)
+  ticketsResolved Int      @default(0)
+  costPerPr       Decimal? @db.Decimal(12, 6)
+  costPerTicket   Decimal? @db.Decimal(12, 6)
+  adoptionScore   Decimal? @db.Decimal(5, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date, teamId])
+  @@index([organizationId, date])
+}
+
+/// Notification channels (email, Slack, Teams)
+model NotificationChannel {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String // "email" | "slack" | "teams"
+  config         Json // { email: "...", webhookUrl: "...", etc. }
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveryLogs NotificationDeliveryLog[]
+
+  @@index([organizationId])
+}
+
+/// Log of notification deliveries
+model NotificationDeliveryLog {
+  id                    String   @id @default(cuid())
+  organizationId        String
+  notificationChannelId String
+  alertId               String?
+  subject               String
+  status                String   @default("sent") // "sent" | "failed" | "pending"
+  errorMessage          String?
+  sentAt                DateTime @default(now())
+
+  organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  notificationChannel NotificationChannel @relation(fields: [notificationChannelId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, sentAt])
+}
+
+/// Data retention policy per organization
+model DataRetentionPolicy {
+  id             String    @id @default(cuid())
+  organizationId String    @unique
+  retentionDays  Int       @default(90)
+  auditLogDays   Int       @default(365)
+  lastCleanupAt  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public-website lead capture
+//
+// These tables are populated by unauthenticated POSTs from /contact and /demo.
+// They are NOT scoped by organizationId — the submitter has no org yet.
+// Admin tooling to triage these submissions ships later.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A submission from the public /contact form.
+model ContactSubmission {
+  id          String  @id @default(cuid())
+  name        String
+  workEmail   String
+  company     String?
+  role        String?
+  companySize String?
+  aiToolsUsed String? @db.Text
+  message     String  @db.Text
+
+  // Provenance (privacy-preserving — no raw IP)
+  source    String? // referring page or utm source
+  userAgent String? @db.Text
+  ipHash    String? // SHA-256(IP + server salt); never raw IP
+
+  // Triage workflow
+  status    String    @default("new") // new | reviewed | replied | archived | spam
+  handledAt DateTime?
+  handledBy String?
+
+  // Email notification outcome (best-effort; failure does NOT block the submission)
+  notificationSentAt DateTime?
+  notificationError  String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([workEmail])
+}
+
+/// A submission from the public /demo form.
+model DemoRequest {
+  id            String  @id @default(cuid())
+  name          String
+  workEmail     String
+  company       String
+  role          String?
+  companySize   String?
+  aiToolsUsed   String? @db.Text
+  preferredTime String? // free-form text from the submitter (e.g. "weekday mornings PT")
+  message       String? @db.Text
+
+  // Provenance (privacy-preserving — no raw IP)
+  source    String?
+  userAgent String? @db.Text
+  ipHash    String?
+
+  // Booking workflow
+  status      String    @default("new") // new | contacted | scheduled | completed | no_show | archived
+  scheduledAt DateTime?
+  handledAt   DateTime?
+  handledBy   String?
+
+  // Email notification outcome (best-effort; failure does NOT block the request)
+  notificationSentAt DateTime?
+  notificationError  String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([workEmail])
+}

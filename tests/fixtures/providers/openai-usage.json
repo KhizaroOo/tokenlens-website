@@ -1,0 +1,48 @@
+{
+  "pages": [
+    {
+      "object": "page",
+      "has_more": true,
+      "next_page": "page_token_abc123",
+      "data": [
+        {
+          "aggregation_timestamp": 1748044800,
+          "results": [
+            { "input_tokens": 12000, "output_tokens": 3500, "input_cached_tokens": 2000, "num_model_requests": 8, "project_id": "proj_abc", "user_id": "user_alice@example.com", "model": "gpt-4o" },
+            { "input_tokens": 8500, "output_tokens": 2100, "input_cached_tokens": 1500, "num_model_requests": 5, "project_id": "proj_abc", "user_id": "user_bob@example.com", "model": "gpt-4o" },
+            { "input_tokens": 4200, "output_tokens": 900, "input_cached_tokens": 400, "num_model_requests": 12, "project_id": "proj_abc", "user_id": "user_carol@example.com", "model": "gpt-4o" },
+            { "input_tokens": 6100, "output_tokens": 1800, "input_cached_tokens": 800, "num_model_requests": 9, "project_id": "proj_abc", "user_id": "user_alice@example.com", "model": "gpt-4o-mini" },
+            { "input_tokens": 3200, "output_tokens": 700, "input_cached_tokens": 300, "num_model_requests": 15, "project_id": "proj_abc", "user_id": "user_bob@example.com", "model": "gpt-4o-mini" },
+            { "input_tokens": 2800, "output_tokens": 550, "input_cached_tokens": 200, "num_model_requests": 11, "project_id": "proj_abc", "user_id": "user_carol@example.com", "model": "gpt-4o-mini" },
+            { "input_tokens": 22000, "output_tokens": 7500, "input_cached_tokens": 5000, "num_model_requests": 3, "project_id": "proj_abc", "user_id": "user_alice@example.com", "model": "gpt-4-turbo" },
+            { "input_tokens": 18500, "output_tokens": 6200, "input_cached_tokens": 4200, "num_model_requests": 2, "project_id": "proj_abc", "user_id": "user_bob@example.com", "model": "gpt-4-turbo" },
+            { "input_tokens": 9800, "output_tokens": 3100, "input_cached_tokens": 2100, "num_model_requests": 1, "project_id": "proj_abc", "user_id": "user_carol@example.com", "model": "gpt-4-turbo" },
+            { "input_tokens": 5000, "output_tokens": 1200, "input_cached_tokens": 0, "num_model_requests": 7, "project_id": "proj_abc", "user_id": null, "model": "gpt-4o" }
+          ]
+        }
+      ]
+    },
+    {
+      "object": "page",
+      "has_more": false,
+      "next_page": null,
+      "data": [
+        {
+          "aggregation_timestamp": 1747958400,
+          "results": [
+            { "input_tokens": 11200, "output_tokens": 3100, "input_cached_tokens": 1800, "num_model_requests": 7, "project_id": "proj_abc", "user_id": "user_alice@example.com", "model": "gpt-4o" },
+            { "input_tokens": 7900, "output_tokens": 1900, "input_cached_tokens": 1200, "num_model_requests": 4, "project_id": "proj_abc", "user_id": "user_bob@example.com", "model": "gpt-4o" },
+            { "input_tokens": 3800, "output_tokens": 800, "input_cached_tokens": 350, "num_model_requests": 10, "project_id": "proj_abc", "user_id": "user_carol@example.com", "model": "gpt-4o" },
+            { "input_tokens": 5500, "output_tokens": 1600, "input_cached_tokens": 700, "num_model_requests": 8, "project_id": "proj_abc", "user_id": "user_alice@example.com", "model": "gpt-4o-mini" },
+            { "input_tokens": 2900, "output_tokens": 600, "input_cached_tokens": 250, "num_model_requests": 13, "project_id": "proj_abc", "user_id": "user_bob@example.com", "model": "gpt-4o-mini" },
+            { "input_tokens": 2400, "output_tokens": 480, "input_cached_tokens": 180, "num_model_requests": 9, "project_id": "proj_abc", "user_id": "user_carol@example.com", "model": "gpt-4o-mini" },
+            { "input_tokens": 19500, "output_tokens": 6800, "input_cached_tokens": 4500, "num_model_requests": 3, "project_id": "proj_abc", "user_id": "user_alice@example.com", "model": "gpt-4-turbo" },
+            { "input_tokens": 16200, "output_tokens": 5500, "input_cached_tokens": 3800, "num_model_requests": 2, "project_id": "proj_abc", "user_id": "user_bob@example.com", "model": "gpt-4-turbo" },
+            { "input_tokens": 8700, "output_tokens": 2800, "input_cached_tokens": 1900, "num_model_requests": 1, "project_id": "proj_abc", "user_id": "user_carol@example.com", "model": "gpt-4-turbo" }
+          ]
+        }
+      ]
+    }
+  ],
+  "_comment": "Two pages. Page 1 has has_more:true and includes a project-level row (user_id:null). Page 2 has has_more:false. Models: gpt-4o, gpt-4o-mini, gpt-4-turbo. 3 users. 2 days."
+}

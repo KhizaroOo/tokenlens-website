@@ -1,0 +1,116 @@
+# =============================================================================
+# TokenLens — .gitignore
+# Stack: Next.js 16 · TypeScript · Tailwind CSS · Prisma · PostgreSQL · Docker
+# =============================================================================
+
+# ── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ── Next.js ──────────────────────────────────────────────────────────────────
+.next/
+out/
+build/
+.next/cache/
+
+# ── TypeScript ────────────────────────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Environment Variables ─────────────────────────────────────────────────────
+# Never commit secrets — copy .env.example and fill locally
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+
+# ── Prisma ────────────────────────────────────────────────────────────────────
+# Keep schema.prisma and migrations tracked; ignore generated client
+prisma/generated/
+# Ignore SQLite dev database if used locally
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ── Database / PostgreSQL ─────────────────────────────────────────────────────
+*.sql.backup
+pgdata/
+postgres-data/
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# Keep docker-compose.yml tracked; ignore runtime volumes and overrides
+docker-compose.override.yml
+docker-compose.local.yml
+.docker/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ── Testing & Coverage ────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# ── Editor & OS ───────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+
+# ── Certificates & Keys ───────────────────────────────────────────────────────
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# ── Deployment ────────────────────────────────────────────────────────────────
+.vercel/
+.netlify/
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
+*.tgz
+*.tar.gz
+.cache/
+.turbo/
+.eslintcache
+.stylelintcache
