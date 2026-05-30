@@ -36,14 +36,14 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
-  const appTotals = byApp.map((r) => ({
+  const appTotals = byApp.map((r: (typeof byApp)[number]) => ({
     app:           r.app,
     activeUsers:   Number(r._sum.activeUsers   ?? 0),
     totalSessions: Number(r._sum.totalSessions ?? 0),
     totalCostUsd:  Number(r._sum.totalCostUsd  ?? 0),
   }));
 
-  const trendData = trend.map((r) => ({
+  const trendData = trend.map((r: (typeof trend)[number]) => ({
     date:          r.date.toISOString().split("T")[0],
     activeUsers:   Number(r._sum.activeUsers   ?? 0),
     totalSessions: Number(r._sum.totalSessions ?? 0),
@@ -52,10 +52,11 @@ export async function GET(req: NextRequest) {
 
   const seat = seatData[0] ?? null;
 
+  type AppTotal = { app: string | null; activeUsers: number; totalSessions: number; totalCostUsd: number };
   const totals = {
-    activeUsers:   appTotals.reduce((s, r) => s + r.activeUsers,   0),
-    totalSessions: appTotals.reduce((s, r) => s + r.totalSessions, 0),
-    totalCostUsd:  appTotals.reduce((s, r) => s + r.totalCostUsd,  0),
+    activeUsers:   appTotals.reduce((s: number, r: AppTotal) => s + r.activeUsers,   0),
+    totalSessions: appTotals.reduce((s: number, r: AppTotal) => s + r.totalSessions, 0),
+    totalCostUsd:  appTotals.reduce((s: number, r: AppTotal) => s + r.totalCostUsd,  0),
     totalSeats:    seat ? Number(seat.totalSeats)  : 0,
     activeSeats:   seat ? Number(seat.activeSeats) : 0,
     costPerSeat:   seat ? Number(seat.costPerSeat) : 30,
