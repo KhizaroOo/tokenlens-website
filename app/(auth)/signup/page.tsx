@@ -1,92 +1,62 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Request access — TokenLens",
+  description:
+    "TokenLens onboards teams in a guided model. Request access and our team will set you up.",
+};
+
+const PORTAL_URL = (process.env.NEXT_PUBLIC_PORTAL_URL || "").replace(/\/$/, "");
+
+const CARD =
+  "relative w-full max-w-[420px] overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl";
 
 /**
- * Signup is currently a contact-sales gate.
- * No public self-serve provisioning is exposed — qualified leads go through
- * /demo and /contact. This page collects intent and redirects to /demo.
- *
- * TODO: When self-serve provisioning is ready, replace this with a real signup form
- *       that calls /api/auth/signup and creates an organization + first user.
+ * No public self-serve provisioning is exposed. Rather than present a form that
+ * does nothing, we route access requests to the real lead-capture flow at /demo
+ * (which persists + notifies) — honest behaviour for a public marketing site.
  */
 export default function SignupPage() {
-  const [submitted, setSubmitted] = useState(false);
-
   return (
-    <div className="w-full max-w-md">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 shadow-2xl">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 grid place-items-center">
-            <div className="h-2 w-2 rounded-full bg-[#050810]" />
-          </div>
-          <span className="text-lg font-bold tracking-tight">
-            Token<span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">Lens</span>
-          </span>
-        </div>
+    <div className={CARD}>
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
 
-        {submitted ? (
-          <div className="text-center py-4">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-400" />
-            <h1 className="mt-4 text-xl font-bold">Thanks for your interest</h1>
-            <p className="mt-2 text-sm text-white/65">
-              We&apos;ll be in touch shortly with onboarding details and a calendar link to schedule your kickoff.
-            </p>
-            <Link
-              href="/demo"
-              className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold rounded-full px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-cyan-400 text-[#050810]"
-            >
-              Or book a demo now <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        ) : (
-          <>
-            <h1 className="text-2xl font-bold tracking-tight">Get started with TokenLens</h1>
-            <p className="mt-2 text-sm text-white/65">
-              TokenLens is rolling out in a guided onboarding model. Tell us a bit about your team and we&apos;ll get you set up — usually within 1 business day.
-            </p>
-
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                // TODO: wire to real provisioning endpoint when self-serve is ready
-                setSubmitted(true);
-              }}
-              className="mt-6 space-y-3"
-            >
-              <input
-                type="text" required placeholder="Full name"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
-              />
-              <input
-                type="email" required placeholder="Work email"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
-              />
-              <input
-                type="text" placeholder="Company"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/30 focus:border-emerald-400/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/30"
-              />
-              <button
-                type="submit"
-                className="w-full inline-flex items-center justify-center gap-1.5 text-sm font-semibold rounded-full px-4 py-3 bg-gradient-to-r from-emerald-400 to-cyan-400 text-[#050810] hover:opacity-90 transition-opacity"
-              >
-                <Sparkles className="h-4 w-4" />
-                Request access
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
-
-            <p className="mt-6 text-xs text-white/45 text-center">
-              Already have an account?{" "}
-              <Link href="/login" className="text-emerald-300 hover:text-emerald-200 font-semibold">
-                Sign in
-              </Link>
-            </p>
-          </>
-        )}
+      <div className="mb-6 flex items-center gap-3">
+        <span className="relative grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 shadow-lg shadow-emerald-500/30">
+          <span className="absolute inset-[13px] rounded-full border-[3px] border-[#060a12]" />
+        </span>
+        <span className="text-2xl font-black tracking-tight text-white">
+          Token<span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Lens</span>
+        </span>
       </div>
+
+      <h1 className="text-lg font-bold text-white/90">Get started with TokenLens</h1>
+      <p className="mt-2 text-sm leading-relaxed text-white/55">
+        TokenLens onboards teams in a guided model — no self-serve sign-up yet. Tell us about your
+        team and we&apos;ll set you up, usually within one business day.
+      </p>
+
+      <Link
+        href="/demo"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:from-emerald-400 hover:to-emerald-500"
+      >
+        Request access
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </Link>
+
+      <Link href="/contact" className="mt-3 block rounded-xl border border-white/15 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-white/5">
+        Talk to the team
+      </Link>
+
+      <p className="mt-6 text-center text-xs text-white/25">
+        Already onboarded?{" "}
+        {PORTAL_URL ? (
+          <a href={`${PORTAL_URL}/login`} className="text-emerald-400/80 hover:text-emerald-300">Sign in to the portal</a>
+        ) : (
+          <Link href="/login" className="text-emerald-400/80 hover:text-emerald-300">Sign in</Link>
+        )}
+      </p>
     </div>
   );
 }
