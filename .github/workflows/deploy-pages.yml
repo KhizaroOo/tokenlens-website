@@ -1,0 +1,91 @@
+# Deploy the TokenLens public website to GitHub Pages as a STATIC EXPORT.
+#
+# ── Important constraint ─────────────────────────────────────────────────────
+# GitHub Pages serves static files only. It cannot run Next.js route handlers
+# (/api/contact, /api/demo-request) or Prisma. So this workflow:
+#   1. Removes app/api before building (POST handlers can't be statically exported).
+#   2. Builds with output: export (NEXT_OUTPUT_MODE=export).
+#   3. Sets NEXT_PUBLIC_LEAD_CAPTURE_MODE=mailto so the contact/demo forms
+#      compose an email to khizar.imtiaz@gmail.com instead of POSTing to a
+#      backend that doesn't exist on Pages. (No fake submissions.)
+#
+# For a deploy WITH working DB-backed lead capture, host on a Node platform
+# (Vercel / Railway / Render) instead — see README.md / docs.
+#
+# Live URL (project Pages): https://<owner>.github.io/tokenlens-website/
+# That subpath is why NEXT_PUBLIC_BASE_PATH is set to /tokenlens-website.
+
+name: Deploy website to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+# Allow the GITHUB_TOKEN to deploy to Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One concurrent Pages deployment; don't cancel an in-progress production deploy
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Project Pages serves under /<repo>/ — keep this in sync with the repo name.
+      NEXT_OUTPUT_MODE: export
+      NEXT_PUBLIC_BASE_PATH: /tokenlens-website
+      # No backend on Pages → forms fall back to an email to the lead inbox.
+      NEXT_PUBLIC_LEAD_CAPTURE_MODE: mailto
+      # Canonical origin for robots.txt / sitemap.xml / OG (project Pages URL).
+      # Update the owner if the GitHub account/org changes.
+      NEXT_PUBLIC_SITE_URL: https://khizarooo.github.io/tokenlens-website
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        # Harmless if unused by the static pages; keeps any prisma import resolvable.
+        run: npx prisma generate
+
+      - name: Remove server-only API routes (cannot be statically exported)
+        run: rm -rf app/api
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Disable Jekyll (so the _next folder is served)
+        run: touch out/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

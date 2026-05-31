@@ -16,6 +16,11 @@ const AGENDA = [
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
+// Static (GitHub Pages) builds set NEXT_PUBLIC_LEAD_CAPTURE_MODE="mailto" — no
+// backend exists, so compose an email instead of POSTing to /api/demo-request.
+const LEAD_CAPTURE_MAILTO = process.env.NEXT_PUBLIC_LEAD_CAPTURE_MODE === "mailto";
+const LEAD_EMAIL = "khizar.imtiaz@gmail.com";
+
 export default function DemoPage() {
   const [state, setState]   = useState<SubmitState>("idle");
   const [errMsg, setErrMsg] = useState<string | null>(null);
@@ -23,7 +28,6 @@ export default function DemoPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrMsg(null);
-    setState("submitting");
 
     const fd = new FormData(e.currentTarget);
     const payload = {
@@ -39,6 +43,30 @@ export default function DemoPage() {
       website:       String(fd.get("website")       ?? ""),
     };
 
+    // Honeypot tripped — behave like success without doing anything.
+    if (payload.website) { setState("success"); return; }
+
+    // Static (GitHub Pages) build: no backend — open the user's email client.
+    if (LEAD_CAPTURE_MAILTO) {
+      const subject = `TokenLens demo request — ${payload.company || payload.name || "inquiry"}`;
+      const body = [
+        `Name: ${payload.name}`,
+        `Work email: ${payload.workEmail}`,
+        `Company: ${payload.company || "—"}`,
+        `Role: ${payload.role || "—"}`,
+        `Company size: ${payload.companySize || "—"}`,
+        `AI tools used: ${payload.aiToolsUsed || "—"}`,
+        `Preferred time: ${payload.preferredTime || "—"}`,
+        ``,
+        payload.message || "(no message)",
+      ].join("\n");
+      window.location.href =
+        `mailto:${LEAD_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      setState("success");
+      return;
+    }
+
+    setState("submitting");
     try {
       const res = await fetch("/api/demo-request", {
         method:  "POST",
@@ -53,7 +81,7 @@ export default function DemoPage() {
       }
       setState("success");
     } catch {
-      setErrMsg("Network error. Please email sales@tokenlens.io directly.");
+      setErrMsg(`Network error. Please email ${LEAD_EMAIL} directly.`);
       setState("error");
     }
   }
@@ -149,14 +177,18 @@ export default function DemoPage() {
             {state === "success" ? (
               <div className="border-2 border-[var(--sg-signal)] p-10 text-center bg-[var(--sg-panel)]">
                 <CheckCircle2 className="mx-auto h-10 w-10 text-[var(--sg-signal)]" />
-                <p className="mt-4 sg-display text-2xl text-[var(--sg-text)]">Demo request received.</p>
+                <p className="mt-4 sg-display text-2xl text-[var(--sg-text)]">
+                  {LEAD_CAPTURE_MAILTO ? "Email composed." : "Demo request received."}
+                </p>
                 <p className="mt-3 text-sm text-[var(--sg-text-soft)] leading-relaxed max-w-md mx-auto">
-                  Our team will contact you to schedule a time.
+                  {LEAD_CAPTURE_MAILTO
+                    ? "We've opened your email app — send it and we'll reach out to schedule."
+                    : "Our team will contact you to schedule a time."}
                 </p>
                 <p className="mt-5 text-xs text-[var(--sg-text-mute)] leading-relaxed max-w-md mx-auto">
                   Need a slot sooner? Email{" "}
-                  <a href="mailto:sales@tokenlens.io?subject=Demo%20request" className="text-[var(--sg-signal)] hover:text-[var(--sg-text)]">
-                    sales@tokenlens.io
+                  <a href={`mailto:${LEAD_EMAIL}?subject=TokenLens%20demo%20request`} className="text-[var(--sg-signal)] hover:text-[var(--sg-text)]">
+                    {LEAD_EMAIL}
                   </a>.
                 </p>
               </div>

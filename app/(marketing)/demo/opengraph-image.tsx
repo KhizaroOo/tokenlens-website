@@ -1,6 +1,6 @@
 import { renderOg } from "@/lib/og-render";
 
-export const runtime = "edge";
+export const dynamic = "force-static";
 
 export const alt         = "Book a TokenLens demo";
 export const size        = { width: 1200, height: 630 };

@@ -86,7 +86,32 @@ See [`.env.example`](.env.example). Summary:
 
 ## Deployment
 
-Needs a Node runtime + Postgres for lead capture (Vercel, Railway, Render, etc.). Set the env vars above. Set `NEXT_PUBLIC_SITE_URL` so SEO files point at the canonical domain, and `NEXT_PUBLIC_PORTAL_URL` so the login/signup links reach the portal.
+Two supported modes:
+
+### A · Node host — full site **with working lead capture** (recommended)
+
+Vercel / Railway / Render / self-hosted. Set the env vars above. `/api/contact` + `/api/demo-request` persist to Postgres and (if `RESEND_API_KEY` + `EMAIL_FROM` are set) email `LEAD_NOTIFICATION_EMAIL`. Set `NEXT_PUBLIC_SITE_URL` for canonical SEO and `NEXT_PUBLIC_PORTAL_URL` for the login/signup links.
+
+```bash
+npm run build && npm start
+```
+
+### B · GitHub Pages — static export (marketing only)
+
+GitHub Pages serves **static files only** — it cannot run the API routes or Prisma. The included workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) handles this:
+
+- Removes `app/api` (POST handlers can't be statically exported).
+- Builds with `NEXT_OUTPUT_MODE=export` and `NEXT_PUBLIC_BASE_PATH=/tokenlens-website` (project-Pages subpath).
+- Sets `NEXT_PUBLIC_LEAD_CAPTURE_MODE=mailto`, so the contact/demo forms **compose an email to `khizar.imtiaz@gmail.com`** instead of POSTing to a backend that isn't there — **no fake submissions**.
+- Adds `.nojekyll` so the `_next/` folder is served.
+
+Enable it in **repo → Settings → Pages → Source: GitHub Actions**, then push to `main`. Live URL: `https://<owner>.github.io/tokenlens-website/`.
+
+> On Pages there is **no database** — leads arrive by email only. For DB-backed capture + server email, use mode A. Reproduce the static build locally with:
+> ```bash
+> rm -rf app/api
+> NEXT_OUTPUT_MODE=export NEXT_PUBLIC_BASE_PATH=/tokenlens-website NEXT_PUBLIC_LEAD_CAPTURE_MODE=mailto npm run build   # → ./out
+> ```
 
 ---
 

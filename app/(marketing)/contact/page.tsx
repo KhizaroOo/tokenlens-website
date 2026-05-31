@@ -7,6 +7,13 @@ import { ExhibitLabel } from "@/components/marketing/gallery";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
+// On a static build (GitHub Pages) there is no backend, so the deploy workflow
+// sets NEXT_PUBLIC_LEAD_CAPTURE_MODE="mailto" and the form composes an email to
+// the lead inbox instead of POSTing to a non-existent /api/contact. On a Node
+// host the flag is unset and the form POSTs to the real endpoint.
+const LEAD_CAPTURE_MAILTO = process.env.NEXT_PUBLIC_LEAD_CAPTURE_MODE === "mailto";
+const LEAD_EMAIL = "khizar.imtiaz@gmail.com";
+
 export default function ContactPage() {
   const [state, setState]   = useState<SubmitState>("idle");
   const [errMsg, setErrMsg] = useState<string | null>(null);
@@ -14,7 +21,6 @@ export default function ContactPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrMsg(null);
-    setState("submitting");
 
     const fd = new FormData(e.currentTarget);
     const payload = {
@@ -29,6 +35,29 @@ export default function ContactPage() {
       website:     String(fd.get("website")     ?? ""),
     };
 
+    // Honeypot tripped — behave like success without doing anything.
+    if (payload.website) { setState("success"); return; }
+
+    // Static (GitHub Pages) build: no backend — open the user's email client.
+    if (LEAD_CAPTURE_MAILTO) {
+      const subject = `TokenLens contact — ${payload.company || payload.name || "inquiry"}`;
+      const body = [
+        `Name: ${payload.name}`,
+        `Work email: ${payload.workEmail}`,
+        `Company: ${payload.company || "—"}`,
+        `Role: ${payload.role || "—"}`,
+        `Company size: ${payload.companySize || "—"}`,
+        `AI tools used: ${payload.aiToolsUsed || "—"}`,
+        ``,
+        payload.message,
+      ].join("\n");
+      window.location.href =
+        `mailto:${LEAD_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      setState("success");
+      return;
+    }
+
+    setState("submitting");
     try {
       const res = await fetch("/api/contact", {
         method:  "POST",
@@ -43,7 +72,7 @@ export default function ContactPage() {
       }
       setState("success");
     } catch {
-      setErrMsg("Network error. Please email sales@tokenlens.io directly.");
+      setErrMsg(`Network error. Please email ${LEAD_EMAIL} directly.`);
       setState("error");
     }
   }
@@ -120,14 +149,18 @@ export default function ContactPage() {
             {state === "success" ? (
               <div className="border-2 border-[var(--sg-signal)] p-10 text-center bg-[var(--sg-bg)]">
                 <CheckCircle2 className="mx-auto h-10 w-10 text-[var(--sg-signal)]" />
-                <p className="mt-4 sg-display text-2xl text-[var(--sg-text)]">Message received.</p>
+                <p className="mt-4 sg-display text-2xl text-[var(--sg-text)]">
+                  {LEAD_CAPTURE_MAILTO ? "Email composed." : "Message received."}
+                </p>
                 <p className="mt-3 text-sm text-[var(--sg-text-soft)] leading-relaxed max-w-md mx-auto">
-                  Our team will review it and respond soon.
+                  {LEAD_CAPTURE_MAILTO
+                    ? "We've opened your email app — send the message and we'll reply soon."
+                    : "Our team will review it and respond soon."}
                 </p>
                 <p className="mt-5 text-xs text-[var(--sg-text-mute)] leading-relaxed max-w-md mx-auto">
-                  Need to reach us urgently? Email{" "}
-                  <a href="mailto:sales@tokenlens.io" className="text-[var(--sg-signal)] hover:text-[var(--sg-text)]">
-                    sales@tokenlens.io
+                  Prefer to write directly? Email{" "}
+                  <a href={`mailto:${LEAD_EMAIL}`} className="text-[var(--sg-signal)] hover:text-[var(--sg-text)]">
+                    {LEAD_EMAIL}
                   </a>.
                 </p>
               </div>

@@ -12,7 +12,9 @@
 
 import { renderOg } from "@/lib/og-render";
 
-export const runtime = "edge";
+// `force-static` lets this render at build time in BOTH server mode and static
+// export (GitHub Pages). The brand image never changes, so static is ideal.
+export const dynamic = "force-static";
 
 export const alt         = "TokenLens — AI Spend & Productivity Intelligence";
 export const size        = { width: 1200, height: 630 };
