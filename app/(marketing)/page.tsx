@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   ArrowUpRight, AlertTriangle, Wallet, Eye, Layers, Users,
   Cpu, GitBranch, DollarSign, ShieldCheck, BarChart3, Activity,
+  CheckCircle2, XCircle,
 } from "lucide-react";
 import {
   ExhibitLabel, MuseumCaption, KineticMetricCard,
@@ -137,6 +138,115 @@ export default function Home() {
       />
 
       {/* ═══════════════════════════════════════════════════════════════════
+          OVERVIEW — ONE OPERATING LENS (value proposition)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="relative py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-5 lg:px-10">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            <div className="lg:col-span-8">
+              <ExhibitLabel index="OVERVIEW" label="ONE OPERATING LENS" tone="signal" />
+              <h2 className="mt-6 sg-display text-4xl lg:text-6xl xl:text-7xl text-[var(--sg-text)] leading-[0.95]">
+                See Every <span className="italic font-light text-[var(--sg-signal)]">AI Tool.</span>
+                <br />
+                Every <span className="italic font-light text-[var(--sg-budget)]">Dollar.</span>
+                <br />
+                Every <span className="italic font-light text-[var(--sg-lens)]">Team.</span>
+              </h2>
+              <p className="mt-8 text-base lg:text-lg text-[var(--sg-text-soft)] leading-relaxed max-w-2xl">
+                TokenLens gives CTOs, CFOs, and platform teams one dashboard for AI spend,
+                adoption, productivity, and governance.
+              </p>
+              <div className="mt-10 flex flex-wrap gap-3">
+                <Link
+                  href="/demo"
+                  className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[var(--sg-ink)] text-[var(--sg-bg)] font-semibold text-sm hover:bg-[var(--sg-signal)] hover:text-[#050505] transition-colors"
+                >
+                  Book a Demo
+                  <ArrowUpRight className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+                </Link>
+                <Link
+                  href="/platform"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 border sg-line text-[var(--sg-text)] font-semibold text-sm hover:border-[var(--sg-ink)]/40 transition-colors"
+                >
+                  See Product Tour
+                </Link>
+              </div>
+            </div>
+
+            {/* Four-pillar rail — the operating layer in one column */}
+            <div className="lg:col-span-4">
+              <div className="border sg-line divide-y divide-[var(--sg-line)] bg-[var(--sg-panel)]">
+                {[
+                  { icon: DollarSign,  label: "SPEND",        note: "Normalized across providers", tone: "var(--sg-budget)"  },
+                  { icon: Users,       label: "ADOPTION",     note: "By team and by user",         tone: "var(--sg-lens)"    },
+                  { icon: BarChart3,   label: "PRODUCTIVITY", note: "Per-tool activity signals",   tone: "var(--sg-signal)"  },
+                  { icon: ShieldCheck, label: "GOVERNANCE",   note: "Budgets, policy, audit",      tone: "var(--sg-anomaly)" },
+                ].map(x => (
+                  <div key={x.label} className="flex items-center gap-4 px-6 py-5 hover:bg-[var(--sg-bg)] transition-colors">
+                    <x.icon className="h-5 w-5 flex-shrink-0" style={{ color: x.tone }} />
+                    <div>
+                      <p className="sg-title text-base text-[var(--sg-text)]">{x.label}</p>
+                      <p className="sg-caption text-[var(--sg-text-mute)] mt-0.5">{x.note}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          THE SHIFT — BEFORE / AFTER TOKENLENS (pain → resolution)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="relative py-20 lg:py-28 bg-[var(--sg-panel)] border-y sg-line">
+        <div className="mx-auto max-w-7xl px-5 lg:px-10">
+          <ExhibitLabel index="THE SHIFT" label="BEFORE / AFTER TOKENLENS" tone="anomaly" />
+          <h2 className="mt-6 sg-display text-4xl lg:text-6xl text-[var(--sg-text)] mb-12 max-w-3xl leading-[0.95]">
+            From <span className="italic font-light text-[var(--sg-risk)]">chaos</span> to <span className="italic font-light text-[var(--sg-signal)]">control.</span>
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-px bg-[var(--sg-line)] border sg-line">
+            {/* Before */}
+            <div className="bg-[var(--sg-bg)] p-8 lg:p-10">
+              <p className="sg-caption text-[var(--sg-risk)]">BEFORE TOKENLENS</p>
+              <ul className="mt-8 space-y-6">
+                {[
+                  "Multiple AI dashboards",
+                  "Unknown spend",
+                  "Idle licenses",
+                  "No governance",
+                ].map(t => (
+                  <li key={t} className="flex items-center gap-4">
+                    <XCircle className="h-6 w-6 text-[var(--sg-risk)] flex-shrink-0" />
+                    <span className="sg-title text-lg lg:text-xl text-[var(--sg-text-mute)]">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* After */}
+            <div className="relative bg-[var(--sg-bg)] p-8 lg:p-10">
+              <span aria-hidden className="absolute -top-px -left-px h-2 w-16 bg-[var(--sg-signal)]" />
+              <p className="sg-caption text-[var(--sg-signal)]">AFTER TOKENLENS</p>
+              <ul className="mt-8 space-y-6">
+                {[
+                  "Unified visibility",
+                  "Team allocation",
+                  "Budget controls",
+                  "Executive reporting",
+                ].map(t => (
+                  <li key={t} className="flex items-center gap-4">
+                    <CheckCircle2 className="h-6 w-6 text-[var(--sg-signal)] flex-shrink-0" />
+                    <span className="sg-title text-lg lg:text-xl text-[var(--sg-text)]">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/*═══════════════════════════════════════════════════════════════════
           EXHIBIT 02 — AI SPEND CHAOS WALL
           ═══════════════════════════════════════════════════════════════════ */}
       <section className="relative py-20 lg:py-32">
