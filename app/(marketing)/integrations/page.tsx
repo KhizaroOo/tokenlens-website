@@ -39,7 +39,7 @@ const DEV = [
 const BIZ = [
   { providerKey: "microsoft_copilot", name: "Microsoft 365 Copilot", category: "Business AI",
     status: "in-progress" as const,
-    examples: ["Licensed seat count", "Active users per app", "Last activity per Office app"] },
+    examples: ["Licensed seat count", "Per-user adoption per app", "Last activity per Office app", "Dormant-seat detection"] },
 ];
 
 export default function IntegrationsPage() {
